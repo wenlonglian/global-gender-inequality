@@ -1,0 +1,48 @@
+```{r}
+##library basic pacs
+library(sf)
+library(tidyverse)
+library(janitor)
+library(dplyr)
+```
+
+```{r}
+##load datasets
+shape <- st_read("../World_Countries_Generalized/World_Countries_Generalized.shp")
+csv <- read_csv("../HDR21-22_Composite_indices_complete_time_series.csv",na="")
+list <- colnames(csv)
+```
+```{r}
+##pick columns
+csv1 <- csv%>%
+  clean_names()%>%
+  dplyr::select(c(1:4),"gii_2010","gii_2019")%>%
+  filter(gii_2010!="NA")
+```
+
+```{r}
+##join data to spadata
+merging_shape <- shape%>%
+    left_join(.,
+              csv1,
+              by=c("COUNTRY"="country"))%>%
+    filter(gii_2010!="NA")
+```  
+
+```{r}
+##make comparison betwwen 2010 and 2019
+new_list <- merging_shape%>%
+  mutate(differnce=gii_2019-gii_2010,.before=gii_2010)%>%
+  mutate(diff=case_when(differnce<0~"Decrease",
+                        TRUE~"Increase_or_unchanged"),.before=differnce)
+```
+
+```{r}
+##simplily plot qtm by single attribute
+install.packages("tmap")
+library(tmap)
+tmap_mode("plot")
+new_list%>%
+  qtm(., fill = "differnce", format = "World", style = "col_blind", projection = "+proj=eck4")
+```
+
