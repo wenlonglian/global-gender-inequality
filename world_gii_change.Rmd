@@ -4,12 +4,13 @@ library(sf)
 library(tidyverse)
 library(janitor)
 library(dplyr)
+library(here)
 ```
 
 ```{r}
 ##load datasets
-shape <- st_read("../World_Countries_Generalized/World_Countries_Generalized.shp")
-csv <- read_csv("../HDR21-22_Composite_indices_complete_time_series.csv",na="")
+shape <- st_read(here("World_Countries_Generalized","World_Countries_Generalized.shp"))
+csv <- read_csv(here("HDR21-22_Composite_indices_complete_time_series.csv"))
 list <- colnames(csv)
 ```
 ```{r}
